@@ -1,13 +1,16 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
+import App from "./App";
+import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <TonConnectUIProvider manifestUrl="/tonconnect-manifest.json">
+        <App />
+      </TonConnectUIProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );

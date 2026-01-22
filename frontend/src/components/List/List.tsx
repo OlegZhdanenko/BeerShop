@@ -5,45 +5,53 @@ import css from "./List.module.css";
 import { api } from "../../lib/axios";
 import { useTelegram } from "../../hook/telegram";
 import type { ProductInterface } from "../../types/product.dto";
+import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 
 export default function List() {
   const { user, initData, isReady } = useTelegram();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+
   const [product, setProduct] = useState<ProductInterface | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [tonConnectUI] = useTonConnectUI();
+  const wallet = useTonWallet();
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!isReady || !initData) return;
 
-    if (!initData) {
-      setError("Please open this App in Telegram");
-      setIsLoading(false);
-      return;
-    }
-
-    async function initializeApp() {
+    (async () => {
       try {
-        await api.post("/api/auth/telegram", {
-          initData,
-        });
-        console.log("✅ Auth success");
+        await api.post("/api/auth/telegram", { initData });
 
-        const response = await api.post("/api/product/create", {
-          name: "beer",
-          priceTon: 10,
+        const res = await api.post("/api/product/create", {
+          name: "Stella Artous",
+          priceTon: 1,
         });
 
-        setProduct(response.data);
+        setProduct(res.data);
         setIsLoading(false);
-      } catch (err: any) {
-        console.error("❌ Error:", err);
-        setError(err.response?.data?.message || "Authentication failed");
-        setIsLoading(false); // ✅ false, не true
+      } catch (e: any) {
+        setError(e.message || "Init error");
+        setIsLoading(false);
       }
-    }
-
-    initializeApp();
+    })();
   }, [isReady, initData]);
+
+  useEffect(() => {
+    if (!wallet || !user) return;
+
+    api.post(
+      "/api/user/bind-wallet",
+      {
+        address: wallet.account.address,
+        network: wallet.account.chain === "-3" ? "testnet" : "mainnet",
+      },
+      {
+        headers: { "x-telegram-id": user.id },
+      },
+    );
+  }, [wallet, user]);
 
   if (error) {
     return (
@@ -66,14 +74,24 @@ export default function List() {
   return (
     <div className={css.container}>
       <BeerAnimation />
+
       {user && (
         <div>
-          <h2>Welcome, {user.first_name || user.username}! 🍺</h2>
+          <h2>Welcome, {user.first_name || user.username}!</h2>
           <p>Telegram ID: {user.id}</p>
-          {user.username && <p>@{user.username}</p>}
+
+          {!wallet ? (
+            <button onClick={() => tonConnectUI.openModal()}>
+              Connect Wallet
+            </button>
+          ) : (
+            <>
+              <p>✅ Wallet connected</p>
+              <Button id={user.id} product={product} />
+            </>
+          )}
         </div>
       )}
-      <Button id={user.id} product={product} />
     </div>
   );
 }

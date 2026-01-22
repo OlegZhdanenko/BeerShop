@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tonconnect/sdk": "^3.3.1",
+    "@tonconnect/ui-react": "^2.3.1",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "react": "^19.2.0",
