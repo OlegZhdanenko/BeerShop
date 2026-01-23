@@ -6,6 +6,7 @@ import { api } from "../../lib/axios";
 import { useTelegram } from "../../hook/telegram";
 import type { ProductInterface } from "../../types/product.dto";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { Toaster } from "react-hot-toast";
 
 export default function List() {
   const { user, initData, isReady } = useTelegram();
@@ -77,6 +78,7 @@ export default function List() {
 
       {user && (
         <div>
+          <Toaster />
           <h2>Welcome, {user.first_name || user.username}!</h2>
           <p>Telegram ID: {user.id}</p>
 

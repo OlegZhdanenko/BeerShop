@@ -8,7 +8,7 @@ import "./index.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <TonConnectUIProvider manifestUrl="/tonconnect-manifest.json">
+      <TonConnectUIProvider manifestUrl="https://raw.githubusercontent.com/OlegZhdanenko/BeerShop/main/tonconnect-manifest.json">
         <App />
       </TonConnectUIProvider>
     </BrowserRouter>

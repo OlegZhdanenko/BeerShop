@@ -3,6 +3,7 @@ import { api } from "../../lib/axios";
 import css from "./Button.module.css";
 import clsx from "clsx";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import toast from "react-hot-toast";
 
 const BUY_ADDRESS = "0QCD_898l4IiP8pg2b13cIKn8bd8IoPI_VOFU3SmA1cKjpFj";
 
@@ -54,6 +55,7 @@ export default function Button({ id, product }: IButton) {
         ],
       });
     } catch (e) {
+      toast.error("You not have any money");
       console.error(e);
       setStatus("FAILED");
     } finally {
